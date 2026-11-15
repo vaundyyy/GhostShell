@@ -1,4 +1,11 @@
 package com.dsmovie.application.port.in;
 
-public class AuthUseCase {
+import com.dsmovie.application.dto.auth.AuthResponse;
+import com.dsmovie.application.dto.auth.LoginRequest;
+import com.dsmovie.application.dto.auth.RegisterRequest;
+
+public interface AuthUseCase {
+    AuthResponse login(LoginRequest request);
+
+    AuthResponse register(RegisterRequest request);
 }
