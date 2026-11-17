@@ -1,4 +1,8 @@
 package com.dsmovie.application.port.in;
 
-public class SaveRatingUseCase {
+import com.dsmovie.application.dto.rating.RatingRequest;
+import com.dsmovie.application.dto.rating.RatingResponse;
+
+public interface SaveRatingUseCase {
+    RatingResponse save(Long authenticatedUserId, RatingRequest request);
 }

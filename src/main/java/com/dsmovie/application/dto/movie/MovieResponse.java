@@ -1,4 +1,10 @@
 package com.dsmovie.application.dto.movie;
 
-public class MovieResponse {
-}
+public record MovieResponse(
+        Long id,
+        String title,
+        String synopsis,
+        String image,
+        double score,
+        int count
+) {}
