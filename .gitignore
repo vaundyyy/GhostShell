@@ -31,6 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+.env.local
+.neon
+node_modules/
 
 # Environment files
 .env
