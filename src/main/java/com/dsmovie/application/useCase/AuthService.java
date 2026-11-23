@@ -12,6 +12,8 @@ import com.dsmovie.domain.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class AuthService implements AuthUseCase {
     private final UserRepositoryPort userRepository;
@@ -28,21 +30,25 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        String email = request.email().trim().toLowerCase();
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthenticationException("Invalid credentials"));
+
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new AuthenticationException("Invalid credentials");
+        }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new AuthenticationException("Invalid credentials");
         }
 
         String token = tokenPort.generateToken(user);
-        return new AuthResponse(user.getId(), user.getName(), user.getEmail(), token);
+        return new AuthResponse(user.getId(), user.getName(), user.getEmail(), user.getRole().name(), token);
     }
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        String email = request.email().trim().toLowerCase();
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
         if (userRepository.findByEmail(email).isPresent()) {
             throw new DadosInvalidosException("Email is already in use");
         }
@@ -51,10 +57,11 @@ public class AuthService implements AuthUseCase {
         user.setName(request.name().trim());
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole(User.Role.USER);
         user.validacaoUser();
 
         User saved = userRepository.save(user);
         String token = tokenPort.generateToken(saved);
-        return new AuthResponse(saved.getId(), saved.getName(), saved.getEmail(), token);
+        return new AuthResponse(saved.getId(), saved.getName(), saved.getEmail(), saved.getRole().name(), token);
     }
 }
