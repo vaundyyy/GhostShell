@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/api/ratings
+  url: http://localhost:8080/api/ratings
   body: json
   auth: bearer
 }
@@ -17,7 +17,7 @@ auth:bearer {
 body:json {
   {
     "movieId": 1,
-    "value": 4.5
+    "value": 5.0
   }
 }
 
@@ -26,4 +26,3 @@ tests {
     expect(res.getStatus()).to.equal(200);
   });
 }
-
