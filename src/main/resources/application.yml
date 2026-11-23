@@ -3,7 +3,9 @@ spring:
     name: gitcine-backend
 
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:backend/.env[.properties]
 
   profiles:
     active: ${APP_PROFILE:${SPRING_PROFILES_ACTIVE:prod}}
@@ -51,6 +53,7 @@ jwt:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  admin-email: ${ADMIN_EMAIL:}
 
 springdoc:
   api-docs:
