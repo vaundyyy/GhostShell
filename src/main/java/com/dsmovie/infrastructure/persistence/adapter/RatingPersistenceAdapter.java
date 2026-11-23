@@ -37,6 +37,22 @@ public class RatingPersistenceAdapter implements RatingRepositoryPort {
         return repository.findValuesByMovieId(movieId);
     }
 
+    @Override
+    public Aggregate aggregateByMovieId(Long movieId) {
+        Object[] aggregate = repository.aggregateByMovieId(movieId);
+        if (aggregate == null || aggregate.length < 2) {
+            return new Aggregate(0.0, 0);
+        }
+
+        double average = aggregate[0] == null
+            ? 0.0
+            : Double.parseDouble(aggregate[0].toString());
+        long count = aggregate[1] == null
+            ? 0
+            : Long.parseLong(aggregate[1].toString());
+        return new Aggregate(average, count);
+    }
+
     private Rating toDomain(RatingEntity entity) {
         RatingId id = new RatingId(entity.getId().getMovieId(), entity.getId().getUserId());
         return new Rating(id, entity.getValue());
