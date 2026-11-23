@@ -9,13 +9,10 @@ public class MovieEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @Column(length = 2000)
-    private String synopsis;
-
-    @Column(length = 1000)
+    @Column(length = 255)
     private String image;
 
     @Column(nullable = false)
@@ -28,8 +25,6 @@ public class MovieEntity {
     public void setId(Long id) { this.id = id; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-    public String getSynopsis() { return synopsis; }
-    public void setSynopsis(String synopsis) { this.synopsis = synopsis; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
     public double getScore() { return score; }
