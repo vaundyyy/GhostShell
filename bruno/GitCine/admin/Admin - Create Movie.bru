@@ -1,0 +1,29 @@
+meta {
+  name: Admin - Create Movie
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/admin/movies
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminJwt}}
+}
+
+body:json {
+  {
+    "title": "Filme criado pelo Bruno",
+    "image": "https://example.com/filme-bruno.jpg"
+  }
+}
+
+tests {
+  test("status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
+
