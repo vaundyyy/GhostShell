@@ -36,4 +36,3 @@ class RatingDomainServiceTest {
                 () -> service.createOrUpdate(null, 10L, 20L, 6.0));
     }
 }
-

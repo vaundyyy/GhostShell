@@ -28,4 +28,3 @@ class UserTest {
         assertThrows(DadosInvalidosException.class, user::validacaoUser);
     }
 }
-

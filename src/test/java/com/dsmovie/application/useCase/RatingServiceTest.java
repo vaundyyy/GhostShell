@@ -75,4 +75,3 @@ class RatingServiceTest {
                 () -> service.save(7L, new RatingRequest(99L, 4.0)));
     }
 }
-

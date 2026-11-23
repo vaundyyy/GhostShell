@@ -21,4 +21,3 @@ Feature: Avaliações de filmes
     And existe o filme 1 para avaliação
     When o usuário avalia o filme 1 com nota 6.0
     Then deve ocorrer uma falha de nota inválida
-
