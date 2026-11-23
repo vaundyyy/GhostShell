@@ -5,9 +5,11 @@ import com.dsmovie.domain.exception.DadosInvalidosException;
 import com.dsmovie.domain.exception.InvalidRatingException;
 import com.dsmovie.domain.exception.MovieNotFoundException;
 import com.dsmovie.domain.exception.UserNotFoundException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,12 +18,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public record ApiError(Instant timestamp, int status, String error, String message, String path) {}
+    @Schema(name = "ApiError", description = "Formato padrão de resposta de erro")
+    public record ApiError(
+            @Schema(description = "Identificador da requisição") String traceId,
+            @Schema(description = "Momento em que o erro ocorreu") Instant timestamp,
+            @Schema(description = "Código HTTP", example = "404") int status,
+            @Schema(description = "Nome do status HTTP", example = "Not Found") String error,
+            @Schema(description = "Descrição legível do erro", example = "Movie not found") String message,
+            @Schema(description = "Caminho da requisição", example = "/api/movies/99") String path
+    ) {}
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
@@ -33,7 +44,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
-    @ExceptionHandler({InvalidRatingException.class})
+    @ExceptionHandler(InvalidRatingException.class)
     public ResponseEntity<ApiError> handleUnprocessable(InvalidRatingException ex, HttpServletRequest request) {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request);
     }
@@ -72,7 +83,14 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request) {
-        ApiError body = new ApiError(Instant.now(), status.value(), status.getReasonPhrase(), message, request.getRequestURI());
-        return ResponseEntity.status(status).body(body);
+        String incomingTraceId = request.getHeader("X-Request-Id");
+        String traceId = incomingTraceId == null || incomingTraceId.isBlank()
+                ? UUID.randomUUID().toString()
+                : incomingTraceId.trim();
+        ApiError body = new ApiError(traceId, Instant.now(), status.value(), status.getReasonPhrase(), message, request.getRequestURI());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Request-Id", traceId);
+        return ResponseEntity.status(status).headers(headers).body(body);
     }
 }
