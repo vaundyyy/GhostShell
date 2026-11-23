@@ -1,0 +1,28 @@
+meta {
+  name: Send Movie Proposal
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/api/movie-requests
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+  {
+    "title": "Oppenheimer",
+    "message": "Gostaria de sugerir este filme para o catálogo."
+  }
+}
+
+tests {
+  test("status is 202", function() {
+    expect(res.getStatus()).to.equal(202);
+  });
+}

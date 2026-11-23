@@ -1,0 +1,28 @@
+meta {
+  name: Save Rating
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/api/ratings
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt}}
+}
+
+body:json {
+  {
+    "movieId": 1,
+    "value": 5.0
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
