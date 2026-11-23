@@ -2,6 +2,8 @@ package com.dsmovie.domain.model;
 
 import com.dsmovie.domain.exception.DadosInvalidosException;
 
+import java.net.URI;
+
 public class Movie {
     private Long id;
     private String title;
@@ -24,6 +26,22 @@ public class Movie {
     public void validate() {
         if (title == null || title.isBlank()) {
             throw new DadosInvalidosException("Title is required");
+        }
+        if (title.length() > 255) {
+            throw new DadosInvalidosException("Title must have at most 255 characters");
+        }
+        if (image != null && !image.isBlank()) {
+            if (image.length() > 255) {
+                throw new DadosInvalidosException("Image must have at most 255 characters");
+            }
+            try {
+                URI uri = URI.create(image);
+                if (!uri.isAbsolute() || (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))) {
+                    throw new DadosInvalidosException("Image must be a valid HTTP or HTTPS URL");
+                }
+            } catch (IllegalArgumentException ex) {
+                throw new DadosInvalidosException("Image must be a valid URL");
+            }
         }
         if (score < 0.0 || count < 0) {
             throw new DadosInvalidosException("Movie score and count cannot be negative");

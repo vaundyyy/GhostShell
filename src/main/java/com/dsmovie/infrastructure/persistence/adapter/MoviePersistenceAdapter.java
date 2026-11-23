@@ -24,6 +24,11 @@ public class MoviePersistenceAdapter implements MovieRepositoryPort {
     }
 
     @Override
+    public Optional<Movie> findByIdForUpdate(Long id) {
+        return repository.findByIdForUpdate(id).map(this::toDomain);
+    }
+
+    @Override
     public List<Movie> findAll(int page, int size) {
         return repository.findAll(PageRequest.of(page, size)).getContent().stream()
                 .map(this::toDomain).toList();
@@ -35,12 +40,17 @@ public class MoviePersistenceAdapter implements MovieRepositoryPort {
     }
 
     @Override
+    public boolean existsByNormalizedTitle(String title) {
+        return repository.existsByTitleIgnoreCase(title.trim());
+    }
+
+    @Override
     public Movie save(Movie movie) {
         return toDomain(repository.save(toEntity(movie)));
     }
 
     private Movie toDomain(MovieEntity entity) {
-        return new Movie(entity.getId(), entity.getTitle(), entity.getSynopsis(),
+        return new Movie(entity.getId(), entity.getTitle(), null,
                 entity.getImage(), entity.getScore(), entity.getCount());
     }
 
@@ -48,7 +58,6 @@ public class MoviePersistenceAdapter implements MovieRepositoryPort {
         MovieEntity entity = new MovieEntity();
         entity.setId(movie.getId());
         entity.setTitle(movie.getTitle());
-        entity.setSynopsis(movie.getSynopsis());
         entity.setImage(movie.getImage());
         entity.setScore(movie.getScore());
         entity.setCount(movie.getCount());
