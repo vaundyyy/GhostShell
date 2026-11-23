@@ -3,56 +3,34 @@
 
 <div align="center">
 
-![alt](https://img.shields.io/badge/java-v17-red?style=flat&logo=coffeescript)
-![alt](https://img.shields.io/badge/spring-v3.0.4-green?style=flat&logo=spring)
-![alt](https://img.shields.io/badge/npm-v8.19.3-red?style=flat&logo=npm)
-![alt](https://img.shields.io/badge/yarn-v1.22.19-blue?style=flat&logo=yarn)
-![alt](https://img.shields.io/badge/node-v16.19.1-green?style=flat&logo=nodedotjs)
-![alt](https://img.shields.io/github/languages/count/lucasferreiraz/dsmovie)
+![alt](https://img.shields.io/badge/java-v25-red?style=flat&logo=coffeescript)
+![alt](https://img.shields.io/badge/spring-v4.1.2-green?style=flat&logo=spring)
 
 </div>
 
-<h1 align="center"><img src="./media/desktop.png"></h1>
-
-## About 📚
-
-The **DSMovie** project was developed through the **8th Edition of DevSuperior's Spring React Week** event. During the course, the basic concepts of the **Spring framework** were covered in the construction of endpoints of a **Rest API** in the **backend** and the **React** base in the composition of the **frontend**, putting everything into practice in the development of this project, **DSMovie**. A fictional service that rates and lists movies.
-
-
-
-## Technologies & Languages Used 🚀
-
-- **Java**
-- **Spring**
-- **Maven**
-- **JPA**
-- **H2 Database**
-- **React JS**
-- **TypeScript**
-- **Axios**
-
-Auxiliary dependencies can be found at: [dependencies](https://github.com/lucasferreiraz/dsmovie/network/dependencies).
-
 ## Backend
 
-Para executar localmente sem configurar um banco, use o perfil `dev`, que utiliza o H2:
+O backend utiliza PostgreSQL diretamente. Em desenvolvimento e em produção, configure um banco PostgreSQL por variáveis de ambiente.
 
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-Para executar com o Neon, configure estas variáveis no ambiente de execução:
+Para executar com o Neon:
 
 ```text
 SPRING_PROFILES_ACTIVE=prod
 SPRING_DATASOURCE_URL=jdbc:postgresql://<host-neon>/<database>?sslmode=require
 SPRING_DATASOURCE_USERNAME=<usuario-neon>
 SPRING_DATASOURCE_PASSWORD=<senha-neon>
+JWT_SECRET=<secret-com-pelo-menos-32-bytes>
+JWT_EXPIRATION=7200000
+JWT_ISSUER=gitcine-backend
 ```
 
-O valor de `SPRING_DATASOURCE_URL` deve começar com `jdbc:postgresql://`. A variável `DATABASE_URL` no formato `postgresql://` fornecido pelo Neon não deve ser usada diretamente pelo Spring Boot.
+Execute:
 
+```bash
+./mvnw spring-boot:run
+```
+
+O valor de `SPRING_DATASOURCE_URL` deve usar o formato `jdbc:postgresql://`. A variável `DATABASE_URL` fornecida pelo Neon no formato `postgresql://` não é consumida diretamente pelo Spring Boot.
 
 ## Layout 🔖
 
