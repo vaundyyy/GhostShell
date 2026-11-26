@@ -28,3 +28,52 @@
   text-align: center;
   line-height: 1.4;
 }
+
+/* ===== Página do admin: painel de avaliações + cadastro de filmes ===== */
+
+.gitcine-admin-page {
+  padding: 36px 0 64px 0;
+  min-height: calc(100vh - 52px);
+}
+
+.gitcine-admin-header {
+  margin-bottom: 24px;
+}
+
+.gitcine-admin-header h2 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--apple-text, #1d1d1f);
+  margin: 6px 0 4px 0;
+}
+
+.gitcine-admin-header p {
+  font-size: 15px;
+  color: var(--apple-text-secondary, #6e6e73);
+  margin: 0;
+}
+
+.gitcine-admin-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+.gitcine-admin-layout .gitcine-auth-card {
+  max-width: none;
+  padding: 32px 28px;
+}
+
+@media (max-width: 1100px) {
+  .gitcine-admin-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gitcine-admin-layout .gitcine-auth-card {
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}

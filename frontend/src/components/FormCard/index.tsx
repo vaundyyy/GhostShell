@@ -2,31 +2,49 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'contexts/AuthContext';
-import { Movie } from 'types/movie';
+import { Movie, RateMovieState } from 'types/movie';
 import { BASE_URL } from 'utils/requests';
+import { fetchMovieById, saveRating, getErrorMessage } from 'services/api';
+import { recordRating } from 'services/ratingHistory';
+import { useApiRequest } from 'hooks/useApiRequest';
+import MoviePoster from 'components/MoviePoster';
 import './styles.css';
 
 type Props = {
   movieId: string;
 };
 
-type LocationState = {
-  movie?: Movie;
-};
+type MoviePreview = NonNullable<RateMovieState['movie']>;
+
+// Converte a nota atual (pode ser decimal, ex.: 4.5) em uma opção do select (1 a 5).
+function toScoreOption(rating?: number): string {
+  if (typeof rating !== 'number' || !Number.isFinite(rating)) {
+    return '5';
+  }
+  return String(Math.min(5, Math.max(1, Math.round(rating))));
+}
+
+// Após salvar, só aceita voltar para caminhos internos da aplicação.
+function safeReturnPath(path?: string): string {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : '/';
+}
 
 function FormCard({ movieId }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin, authenticated, userEmail } = useAuth();
+  const { run } = useApiRequest();
 
-  const stateMovie = (location.state as LocationState | null)?.movie;
+  const locationState = location.state as RateMovieState | null;
+  const stateMovie = locationState?.movie;
+  const returnTo = safeReturnPath(locationState?.returnTo);
 
-  const [movie, setMovie] = useState<Movie | undefined>(stateMovie);
+  const [movie, setMovie] = useState<MoviePreview | undefined>(stateMovie);
   const [title, setTitle] = useState(stateMovie?.title || '');
   const [image, setImage] = useState(stateMovie?.image || '');
 
   // Estado do fluxo de avaliação (usuário comum)
-  const [score, setScore] = useState('5');
+  const [score, setScore] = useState(() => toScoreOption(locationState?.currentRating));
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -40,15 +58,23 @@ function FormCard({ movieId }: Props) {
   }, [authenticated, isAdmin]);
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/movies/${movieId}`)
-      .then((response) => {
-        const data: Movie = response.data;
+    let active = true; // ignora a resposta se o usuário já saiu da tela ou trocou de filme
+
+    fetchMovieById(movieId)
+      .then((data: Movie) => {
+        if (!active) return;
         setMovie(data);
         setTitle(data.title);
         setImage(data.image);
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!active) return;
+        setErrorMsg(getErrorMessage(err, 'Não foi possível carregar o filme.', { 404: 'Filme não encontrado.' }));
+      });
+
+    return () => {
+      active = false;
+    };
   }, [movieId]);
 
   const handleAdminSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -86,7 +112,7 @@ function FormCard({ movieId }: Props) {
       });
   };
 
-  const handleScoreSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleScoreSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSuccessMsg('');
 
@@ -98,33 +124,29 @@ function FormCard({ movieId }: Props) {
     setErrorMsg('');
     setSubmitting(true);
 
-    const activeEmail = userEmail || 'usuario@gitcine.com';
-
-    const config: AxiosRequestConfig = {
-      baseURL: BASE_URL,
-      method: 'PUT',
-      url: '/scores',
-      data: {
-        email: activeEmail,
-        movieId: movieId,
-        score: Number(score),
-      },
-    };
-
-    axios(config)
-      .then(() => {
-        setSuccessMsg('Avaliação registrada com sucesso!');
-        setTimeout(() => {
-          navigate('/');
-        }, 500);
-      })
-      .catch((err) => {
-        const backendMessage = err?.response?.data?.message;
-        setErrorMsg(
-          backendMessage || 'Erro ao registrar a avaliação. Tente novamente.'
-        );
+    const result = await run(() => saveRating(Number(movieId), Number(score)), {
+      fallback: 'Erro ao registrar a avaliação. Tente novamente.',
+      onError: (message) => {
+        setErrorMsg(message);
         setSubmitting(false);
-      });
+      },
+    });
+    if (!result.ok) {
+      return;
+    }
+
+    // Guarda no histórico deste navegador (alimenta a tela "Minhas Avaliações").
+    recordRating(userEmail, {
+      movieId: result.data.movieId,
+      title: movie?.title || `Filme #${movieId}`,
+      image: movie?.image || '',
+      value: result.data.value,
+    });
+
+    setSuccessMsg('Avaliação registrada com sucesso!');
+    setTimeout(() => {
+      navigate(returnTo);
+    }, 500);
   };
 
   const displayImage = isAdmin ? image || movie?.image : movie?.image;
@@ -134,11 +156,7 @@ function FormCard({ movieId }: Props) {
     <div className="gitcine-rate-card">
       {displayImage && (
         <div className="gitcine-rate-image-wrapper">
-          <img
-            className="gitcine-rate-image"
-            src={displayImage}
-            alt={displayTitle || 'Filme'}
-          />
+          <MoviePoster className="gitcine-rate-image" src={displayImage} title={displayTitle || 'Filme'} />
         </div>
       )}
 

@@ -1,10 +1,12 @@
-import axios from "axios";
 import MovieCard from "components/MovieCard";
 import Pagination from "components/Pagination";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Movie, MoviePage } from "types/movie";
-import { BASE_URL } from "utils/requests";
+import { fetchMovies, MAX_PAGE_SIZE, PAGE_SIZE } from "services/api";
 import "./styles.css";
+
+// Depois deste tempo carregando, avisa que o servidor pode estar acordando (Render gratuito).
+const SLOW_SERVER_HINT_MS = 5000;
 
 function Listing() {
   const [pageNumber, setPageNumber] = useState(0);
@@ -12,6 +14,7 @@ function Listing() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [slowServer, setSlowServer] = useState(false);
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -29,39 +32,47 @@ function Listing() {
   });
 
   useEffect(() => {
+    // Ignora respostas de requisições antigas (página ou busca trocada antes da resposta chegar).
+    let active = true;
+    const term = searchTerm.trim();
     setLoading(true);
     setErrorMsg("");
 
-    const term = searchTerm.trim();
+    // Na busca, carrega até o limite do backend (100 itens) e filtra no navegador.
+    const request = term ? fetchMovies(0, MAX_PAGE_SIZE) : fetchMovies(pageNumber, PAGE_SIZE);
 
-    if (term) {
-      axios
-        .get(`${BASE_URL}/movies?page=0&size=1000`)
-        .then((response) => {
-          const data = response.data as MoviePage;
+    request
+      .then((data) => {
+        if (!active) return;
+        if (term) {
           setAllMovies(data.content);
-        })
-        .catch(() => {
-          setErrorMsg("Não foi possível buscar os filmes. Verifique se o backend está rodando na porta 8080.");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      axios
-        .get(`${BASE_URL}/movies?page=${pageNumber}&size=12`)
-        .then((response) => {
-          const data = response.data as MoviePage;
+        } else {
           setPage(data);
-        })
-        .catch(() => {
-          setErrorMsg("Não foi possível carregar os filmes. Verifique se o backend está rodando na porta 8080.");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setErrorMsg(
+          `Não foi possível ${term ? "buscar" : "carregar"} os filmes. Verifique sua conexão ou tente novamente em alguns segundos.`
+        );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [pageNumber, searchTerm]);
+
+  useEffect(() => {
+    if (!loading) {
+      setSlowServer(false);
+      return;
+    }
+    const timer = setTimeout(() => setSlowServer(true), SLOW_SERVER_HINT_MS);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const handleOpenSearch = () => {
     setSearchOpen(true);
@@ -146,6 +157,9 @@ function Listing() {
         {loading ? (
           <div className="gitcine-state-box">
             <span>Carregando catálogo...</span>
+            {slowServer && (
+              <small>O servidor está iniciando (plano gratuito do Render). Isso pode levar até 1 minuto.</small>
+            )}
           </div>
         ) : errorMsg ? (
           <div className="gitcine-state-box">

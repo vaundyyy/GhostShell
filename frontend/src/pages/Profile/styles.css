@@ -153,3 +153,191 @@
     text-align: center;
   }
 }
+
+/* ===== Minhas Avaliações: faixa de recentes, filtros e lista ===== */
+
+.gitcine-profile-info .gitcine-profile-email {
+  margin-top: 6px;
+  font-weight: 500;
+  color: var(--apple-text, #1d1d1f);
+}
+
+.gitcine-evaluations-section {
+  margin-bottom: 40px;
+}
+
+.gitcine-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.gitcine-evaluations-section .gitcine-section-header h3 {
+  margin-bottom: 0;
+}
+
+.gitcine-count-badge {
+  background-color: rgba(0, 113, 227, 0.1);
+  color: var(--apple-accent, #0071e3);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.gitcine-history-note {
+  font-size: 13px;
+  color: var(--apple-text-secondary, #6e6e73);
+  margin: 0 0 16px 0;
+}
+
+.gitcine-recent-strip {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 2px 14px 2px;
+  scroll-snap-type: x mandatory;
+}
+
+.gitcine-recent-card {
+  /* 6 cards por linha no desktop; em telas menores a faixa rola na horizontal */
+  flex: 0 0 calc((100% - 80px) / 6);
+  min-width: 170px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--apple-card-bg, #ffffff);
+  border: 1px solid var(--apple-border, rgba(0, 0, 0, 0.08));
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gitcine-recent-card:hover,
+.gitcine-recent-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--apple-shadow, 0 8px 24px rgba(0, 0, 0, 0.06));
+}
+
+.gitcine-recent-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background-color: #e8e8ed;
+}
+
+.gitcine-recent-info {
+  padding: 12px 14px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gitcine-recent-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apple-text, #1d1d1f);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gitcine-recent-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gitcine-recent-score .dsmovie-stars-container {
+  width: 92px;
+}
+
+.gitcine-recent-score .dsmovie-stars-container svg {
+  width: 16px;
+}
+
+.gitcine-recent-score strong {
+  font-size: 13px;
+  color: #ffbb3a;
+}
+
+.gitcine-recent-date,
+.gitcine-eval-date {
+  font-size: 12px;
+  color: var(--apple-text-secondary, #6e6e73);
+}
+
+/* As fotos do catálogo são horizontais (16:9): a miniatura da lista segue a mesma proporção. */
+.gitcine-evaluation-card .gitcine-eval-image {
+  width: 112px;
+  height: 63px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.gitcine-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.gitcine-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 170px;
+}
+
+.gitcine-filter-search {
+  flex: 1 1 240px;
+}
+
+.gitcine-filter-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-text-secondary, #6e6e73);
+}
+
+.gitcine-filter-field input,
+.gitcine-filter-field select {
+  height: 38px;
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--apple-text, #1d1d1f);
+  background-color: var(--apple-card-bg, #ffffff);
+  border: 1px solid var(--apple-border, rgba(0, 0, 0, 0.08));
+  border-radius: 10px;
+  outline: none;
+}
+
+.gitcine-filter-field input:focus,
+.gitcine-filter-field select:focus {
+  border-color: var(--apple-accent, #0071e3);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+.gitcine-clear-filters {
+  border: none;
+  background-color: rgba(0, 113, 227, 0.1);
+  color: var(--apple-accent, #0071e3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .gitcine-filter-field {
+    flex: 1 1 100%;
+  }
+
+  .gitcine-recent-card {
+    flex-basis: 70%;
+  }
+}

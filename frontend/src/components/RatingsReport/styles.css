@@ -1,0 +1,281 @@
+/* ===== Painel de avaliações do admin ===== */
+
+.gitcine-report {
+  background-color: var(--apple-card-bg, #ffffff);
+  border: 1px solid var(--apple-border, rgba(0, 0, 0, 0.08));
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: var(--apple-shadow, 0 8px 24px rgba(0, 0, 0, 0.06));
+}
+
+.gitcine-report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.gitcine-report-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--apple-text, #1d1d1f);
+  margin: 0 0 4px 0;
+}
+
+.gitcine-report-header p {
+  font-size: 13px;
+  color: var(--apple-text-secondary, #6e6e73);
+  margin: 0;
+}
+
+.gitcine-report-primary,
+.gitcine-report-secondary {
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gitcine-report-primary {
+  background-color: var(--apple-accent, #0071e3);
+  color: #ffffff;
+  padding: 10px 18px;
+}
+
+.gitcine-report-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.gitcine-report-secondary {
+  background-color: rgba(0, 113, 227, 0.1);
+  color: var(--apple-accent, #0071e3);
+  padding: 8px 14px;
+}
+
+/* Indicadores */
+.gitcine-report-kpis {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gitcine-report-kpis li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.gitcine-report-kpis span {
+  font-size: 12px;
+  color: var(--apple-text-secondary, #6e6e73);
+}
+
+.gitcine-report-kpis strong {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--apple-text, #1d1d1f);
+  line-height: 1.1;
+}
+
+.gitcine-report-kpis small {
+  font-size: 12px;
+  color: #b25000;
+}
+
+/* Resumo */
+.gitcine-report-summary {
+  border: 1px solid var(--apple-border, rgba(0, 0, 0, 0.08));
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background-color: rgba(0, 113, 227, 0.03);
+}
+
+.gitcine-report-summary pre {
+  margin: 0 0 14px 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--apple-text, #1d1d1f);
+}
+
+.gitcine-report-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.gitcine-report-summary-actions [role='status'] {
+  font-size: 13px;
+  color: #248a3d;
+}
+
+/* Filtros */
+.gitcine-report-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.gitcine-report-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 170px;
+}
+
+.gitcine-report-search {
+  flex: 1 1 220px;
+}
+
+.gitcine-report-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--apple-text-secondary, #6e6e73);
+}
+
+.gitcine-report-field input,
+.gitcine-report-field select {
+  height: 38px;
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--apple-text, #1d1d1f);
+  background-color: var(--apple-card-bg, #ffffff);
+  border: 1px solid var(--apple-border, rgba(0, 0, 0, 0.08));
+  border-radius: 10px;
+  outline: none;
+}
+
+.gitcine-report-field input:focus,
+.gitcine-report-field select:focus {
+  border-color: var(--apple-accent, #0071e3);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+.gitcine-report-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  font-size: 13px;
+  color: var(--apple-text, #1d1d1f);
+  cursor: pointer;
+}
+
+/* Gráfico de barras (aprovação por filme) */
+.gitcine-report-count {
+  font-size: 12px;
+  color: var(--apple-text-secondary, #6e6e73);
+  margin: 0 0 8px 0;
+}
+
+.gitcine-report-chart {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gitcine-report-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 6px;
+  border-radius: 12px;
+}
+
+.gitcine-report-row:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.gitcine-report-thumb {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.gitcine-report-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gitcine-report-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gitcine-report-line h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apple-text, #1d1d1f);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gitcine-report-line strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apple-text, #1d1d1f);
+  font-variant-numeric: tabular-nums;
+}
+
+.gitcine-report-bar {
+  height: 8px;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.gitcine-report-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffbb3a, #ff9f0a);
+}
+
+.gitcine-report-meta {
+  font-size: 12px;
+  color: var(--apple-text-secondary, #6e6e73);
+}
+
+@media (max-width: 768px) {
+  .gitcine-report {
+    padding: 20px 16px;
+  }
+
+  .gitcine-report-header {
+    flex-direction: column;
+  }
+
+  .gitcine-report-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gitcine-report-field {
+    flex: 1 1 100%;
+  }
+}

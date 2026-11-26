@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useApiRequest } from 'hooks/useApiRequest';
+import { register } from 'services/api';
 import '../Login/styles.css';
 
 function Register() {
@@ -15,6 +17,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const { run, pending } = useApiRequest();
 
   useEffect(() => {
     return () => {
@@ -24,7 +27,7 @@ function Register() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = name.trim();
@@ -42,8 +45,9 @@ function Register() {
       return;
     }
 
-    if (password.length < 8) {
-      setErrorMessage('A senha deve conter pelo menos 8 caracteres.');
+    // Mesma regra do backend (RegisterRequest: @Size(min = 8, max = 24))
+    if (password.length < 8 || password.length > 24) {
+      setErrorMessage('A senha deve conter entre 8 e 24 caracteres.');
       setSuccessMessage('');
       return;
     }
@@ -55,6 +59,16 @@ function Register() {
     }
 
     setErrorMessage('');
+
+    const result = await run(() => register({ name: trimmedName, email: trimmedEmail, password }), {
+      fallback: 'Não foi possível criar a conta. Tente novamente.',
+      messages: { 409: 'Este e-mail já está cadastrado.' },
+      onError: setErrorMessage,
+    });
+    if (!result.ok) {
+      return;
+    }
+
     setSuccessMessage('Conta criada com sucesso! Redirecionando...');
 
     if (redirectTimeoutRef.current !== null) {
@@ -135,8 +149,8 @@ function Register() {
             />
           </div>
 
-          <button type="submit" className="gitcine-btn-primary">
-            Cadastrar
+          <button type="submit" className="gitcine-btn-primary" disabled={pending}>
+            {pending ? 'Cadastrando...' : 'Cadastrar'}
           </button>
         </form>
 
