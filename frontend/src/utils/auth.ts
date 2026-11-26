@@ -1,5 +1,4 @@
-// Apenas criado para ter um arquivo de autenticação, 
-// quando tiver o backend pronto, tem que mudar para pegar do token.
+// Persistência do token JWT retornado pelo backend (POST /api/auth/login e /register).
 
 const TOKEN_KEY = '@GitCine:token';
 
@@ -14,4 +13,8 @@ export const getToken = (): string | null => {
 export const removeToken = (): void => {
   localStorage.removeItem(TOKEN_KEY);
 };
-    
+
+// O backend devolve a role como "USER" ou "ADMIN"; o AuthContext trabalha com 'user' | 'admin'.
+export const toFrontendRole = (role?: string | null): 'user' | 'admin' => {
+  return role?.toUpperCase() === 'ADMIN' ? 'admin' : 'user';
+};

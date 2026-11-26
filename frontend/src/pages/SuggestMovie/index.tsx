@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useApiRequest } from 'hooks/useApiRequest';
+import { sendMovieProposal } from 'services/api';
 import '../Login/styles.css';
 
 function SuggestMovie() {
@@ -7,8 +9,9 @@ function SuggestMovie() {
   const [movieTitle, setMovieTitle] = useState('');
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
+  const { run, pending } = useApiRequest();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!userName.trim() || !movieTitle.trim()) {
@@ -18,19 +21,31 @@ function SuggestMovie() {
     }
 
     setError('');
-    setInfoMessage(
-      `Sugestão de "${movieTitle.trim()}" preparada. O envio direto por e-mail para o admin estará disponível no próximo lançamento!`
-    );
+    setInfoMessage('');
+
+    const title = movieTitle.trim();
+    // O usuário é identificado pelo JWT; o nome informado segue no campo message.
+    const result = await run(() => sendMovieProposal({ title, message: `Indicação enviada por ${userName.trim()}` }), {
+      fallback: 'Não foi possível enviar a indicação. Tente novamente.',
+      onError: setError,
+    });
+    if (!result.ok) {
+      return;
+    }
+
+    setInfoMessage(`Indicação de "${title}" enviada ao administrador por e-mail!`);
+    setUserName('');
+    setMovieTitle('');
   };
 
   return (
     <div className="gitcine-auth-container">
       <div className="gitcine-auth-card">
         <div className="gitcine-auth-header">
-          <span className="gitcine-rate-badge">Próximo lançamento</span>
+          <span className="gitcine-rate-badge">Indicação</span>
           <h2>Indicar um Filme</h2>
           <p>
-            Envie sua indicação direto para o admin por e-mail — esse envio direto chega no próximo lançamento do GitCine.
+            Envie sua indicação direto para o admin por e-mail.
           </p>
         </div>
 
@@ -62,8 +77,8 @@ function SuggestMovie() {
             />
           </div>
 
-          <button type="submit" className="gitcine-btn-primary">
-            Enviar direto por e-mail (Em breve)
+          <button type="submit" className="gitcine-btn-primary" disabled={pending}>
+            {pending ? 'Enviando...' : 'Enviar por e-mail'}
           </button>
         </form>
 

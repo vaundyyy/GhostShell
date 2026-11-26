@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'contexts/AuthContext';
+import { LoginRedirectState, useApiRequest } from 'hooks/useApiRequest';
+import { login as loginRequest } from 'services/api';
+import { toFrontendRole } from 'utils/auth';
 import './styles.css';
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirect = location.state as LoginRedirectState | null;
   const { login } = useAuth();
+  const { run, pending } = useApiRequest();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -20,14 +26,19 @@ function Login() {
 
     setErrorMessage('');
 
-    if (email.trim().toLowerCase() === 'admin@admin.com' && password === 'admin') {
-      login('token-admin-gitcine', 'admin');
-      navigate('/');
+    const result = await run(() => loginRequest({ email, password }), {
+      fallback: 'Não foi possível entrar. Tente novamente.',
+      messages: { 401: 'E-mail ou senha inválidos.' },
+      onError: setErrorMessage,
+    });
+    if (!result.ok) {
       return;
     }
 
-    login('token-user-gitcine', 'user', email.trim().toLowerCase());
-    navigate('/');
+    const auth = result.data;
+    login(auth.token, toFrontendRole(auth.role), auth.email);
+    // Volta para a página protegida que o usuário tentou abrir (enviada pelo PrivateRoute).
+    navigate(redirect?.from?.pathname ?? '/', { replace: true });
   };
 
   return (
@@ -38,9 +49,9 @@ function Login() {
           <p>Insira suas credenciais para avaliar filmes e acessar seu perfil.</p>
         </div>
 
-        {errorMessage && (
+        {(errorMessage || redirect?.message) && (
           <div className="gitcine-auth-alert">
-            {errorMessage}
+            {errorMessage || redirect?.message}
           </div>
         )}
 
@@ -69,8 +80,8 @@ function Login() {
             />
           </div>
 
-          <button type="submit" className="gitcine-btn-primary">
-            Continuar
+          <button type="submit" className="gitcine-btn-primary" disabled={pending}>
+            {pending ? 'Entrando...' : 'Continuar'}
           </button>
         </form>
 

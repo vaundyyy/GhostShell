@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from 'contexts/AuthContext';
 import MovieScore from '../MovieScore';
+import MoviePoster from '../MoviePoster';
 import { Movie } from 'types/movie';
 import './styles.css';
 
@@ -14,11 +15,7 @@ function MovieCard({ movie }: Props) {
   return (
     <div className="gitcine-movie-card">
       <div className="gitcine-card-image-wrapper">
-        <img
-          className="gitcine-movie-card-image"
-          src={movie.image}
-          alt={movie.title}
-        />
+        <MoviePoster className="gitcine-movie-card-image" src={movie.image} title={movie.title} />
       </div>
 
       <div className="gitcine-card-bottom-container">
